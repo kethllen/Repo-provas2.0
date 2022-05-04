@@ -26,7 +26,17 @@ function Disciplines() {
   const { token } = useAuth();
   const [terms, setTerms] = useState<TestByDiscipline[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [searchInput, setSearchInput ] = useState<string>("");
 
+
+//   function searchDisciplineFilter(term: any) {
+//     for (let i = 0; i < term?.termData.length; i++) {
+//         if (term?.disciplines.name.toUpperCase().includes(searchInput.toUpperCase())) {
+//             return true;
+//         }
+//     }
+//     return false;
+// }
   useEffect(() => {
     async function loadPage() {
       if (!token) return;
@@ -44,6 +54,11 @@ function Disciplines() {
       <TextField
         sx={{ marginX: "auto", marginBottom: "25px", width: "450px" }}
         label="Pesquise por disciplina"
+        name="search"
+        type="text"
+        variant="outlined"
+        // onChange={e => setSearchInput(e.target.value)}
+        // value={searchInput}
       />
       <Divider sx={{ marginBottom: "35px" }} />
       <Box
@@ -76,7 +91,7 @@ function Disciplines() {
             Adicionar
           </Button>
         </Box>
-        <TermsAccordions categories={categories} terms={terms} />
+        <TermsAccordions categories={categories} terms={terms} /> 
       </Box>
     </>
   );
@@ -86,7 +101,7 @@ interface TermsAccordionsProps {
   categories: Category[];
   terms: TestByDiscipline[];
 }
-
+//terms?.filter(searchDisciplineFilter)
 function TermsAccordions({ categories, terms }: TermsAccordionsProps) {
   return (
     <Box sx={{ marginTop: "50px" }}>

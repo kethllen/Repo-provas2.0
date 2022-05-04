@@ -92,12 +92,39 @@ async function getCategories(token: string) {
   return baseAPI.get<{ categories: Category[] }>("/categories", config);
 }
 
+async function getDisciplines(token: string) {
+  const config = getConfig(token);
+  return baseAPI.get<{ disciplines: Discipline[] }>("/disciplines", config);
+}
+
+export async function createTest(token: string, data: any) {
+  const config = getConfig(token)
+
+  const formData = new FormData()
+
+  formData.append("name", data.name)
+  formData.append("pdfUrl", data.pdfUrl)
+  formData.append("categoryId", data.categoryId)
+  formData.append("teacherDisciplineId", data.teacherDisciplineId)
+
+  baseAPI.post("/test", formData,config)
+
+}
+
+export async function addViewCount(token: string, id: number) {
+  const config = getConfig(token)
+
+  baseAPI.patch(`/test/${id}/addView`, {}, config)
+
+}
+
 const api = {
   signUp,
   signIn,
   getTestsByDiscipline,
   getTestsByTeacher,
   getCategories,
+  getDisciplines
 };
 
 export default api;
