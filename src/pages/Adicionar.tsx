@@ -72,53 +72,86 @@ function Adicionar() {
     teacher: "",
 
   })
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [category, setCategory] = useState(null);
   const [categoriesAc, setCategoriesAc] = useState<CategoryAc[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryInputValue, setCategoryInputValue] = useState('');
+
+  const [discipline, setDiscipline] = useState(null);
+  const [disciplinesAc, setDisciplinesAc] = useState<CategoryAc[]>([]);
   const [disciplines, setDisciplines] = useState<Discipline[]>([]);
-  const [teacher, setTeachers] = useState<Teacher[]>([]);
-  const [teachersDisciplines, setTeachersDisciplines] = useState<
-  TestByTeacher[]
->([]);
+  const [disciplineInputValue, setDisciplineInputValue] = useState('');
 
-  // useEffect(() => {
-  //   async function loadPage() {
-  //     if (!token) return;
+  const [instructor, setInstructor] = useState(null);
+  const [instructorsAc, setInstructorsAc] = useState<CategoryAc[]>([]);
+  const [instructors, setInstructors] = useState(null);
+  const [instructorInputValue, setInstructorInputValue] = useState('');
 
-  //     const { data: teachers } = await api.getTestsByTeacher(token);
-  //     setTeachersDisciplines(teachers.tests);
-  //     const { data: categoriesData } = await api.getCategories(token);
-  //     setCategories(categoriesData.categories);
-  //     const { data: courses } = await api.getDisciplines(token);
-  //     setDisciplines(courses.disciplines);
-  //   }
-  //   loadPage();
-  // }, [token]);
 
-  // setTeachers(getUniqueTeachers(teachersDisciplines));
-  // setCategoriesAc(categories.map(obj => {
-  //   return {
-  //     label: obj.name,
-  //     id: obj.id
-  //   };
-  // }))
+  useEffect(() => {
+    async function loadPage() {
+      if (!token) return;
+
+      const { data: categoriesData } = await api.getCategories(token);
+      setCategories(categoriesData.categories);
+
+      const { data: courses } = await api.getDisciplines(token);
+      setDisciplines(courses.disciplines);
+      
+    }
+    
+    loadPage();
+  }, [token]);
+  useEffect( () =>{
   
+    setCategoriesAc(categories.map(obj => {
+      return {
+        label: obj.name,
+        id: obj.id
+      };
+    }))
+    setDisciplinesAc(disciplines.map(obj => {
+      return {
+        label: obj.name,
+        id: obj.id
+      };
+    }))
+    teachersData()
+     
+  
+  }, [disciplines])
+   
+  async function teachersData(){
+    let promise;
+    if (discipline !== null) {
+      promise = await api.getInstructorsByDiscipline(token,
+        discipline?.id
+      );
+    } else {
+      promise = await api.getInstructorsByDiscipline(token,
+        ""
+      );
+    }
+
+    setInstructors(promise?.data);
+  }
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   }
 
-  // function getUniqueTeachers(teachersDisciplines: TestByTeacher[]) {
-  //   return [
-  //     ...new Set(
-  //       teachersDisciplines.map(
-  //         (teacherDiscipline) => (
-  //           {id:teacherDiscipline.teacher.id,
-  //            name:teacherDiscipline.teacher.name}
-  //            )
-  //       )
-  //     ),
-  //   ];
-  // }
-
+  function getUniqueTeachers(teachersDisciplines: TestByTeacher[]) {
+    return [
+      ...new Set(
+        teachersDisciplines.map(
+          (teacherDiscipline) => (
+            {id:teacherDiscipline.teacher.id,
+             name:teacherDiscipline.teacher.name}
+             )
+        )
+      ),
+    ];
+  }
+  
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setMessage(null);
@@ -212,20 +245,48 @@ function Adicionar() {
           value={formData.title}
         />
         <Autocomplete
-        sx={styles.input}
-      options={categoriesAc}
-      renderInput={(params) => <TextField {...params} label="Categoria" />}
-      />  
+        value={formData.category}
+        onChange={(event, newValue) => {
+          setFormData({ ...formData, [e.target.name]: e.target.value })
+        }}
+        inputValue={categoryInputValue}
+        onInputChange={(event, newInputValue) => {
+          setCategoryInputValue(newInputValue);
+        }}
+        id="categories"
+        options={categoriesAc}
+        // isOptionEqualToValue={(category) => { return ({ id: category.id, label: category.name }) }}
+        renderInput={(params) => <TextField {...params} label="Categoria" required />}
+        sx={styles.input}/>
       <Autocomplete
-        sx={styles.input}
-      options={categoriesAc}
-      renderInput={(params) => <TextField {...params} label="Disciplina" />}
-      />  
+           value={formData.discipline}
+           onChange={(event, newValue) => {
+             setFormData({ ...formData, [e.target.name]: e.target.value })
+           }}
+           inputValue={disciplineInputValue}
+           onInputChange={(event, newInputValue) => {
+             setDisciplineInputValue(newInputValue);
+           }}
+           id="disciplines"
+           options={disciplinesAc}
+          
+           renderInput={(params) => <TextField {...params} label="Disciplina" />}
+           sx={styles.input}/>
       <Autocomplete
-        sx={styles.input}
-      options={categoriesAc}
-      renderInput={(params) => <TextField {...params} label="Pessoa Instrutora" />}
-      />  
+        value={formData.teacher}
+        onChange={(event, newValue) => {
+          setFormData({ ...formData, [e.target.name]: e.target.value })
+        }}
+        inputValue={instructorInputValue}
+        onInputChange={(event, newInputValue) => {
+          setInstructorInputValue(newInputValue);
+        }}
+        id="instructors"
+        options={instructorsAc}
+       
+        renderInput={(params) => <TextField {...params} label="Pessoa Instrutora" />}
+        sx={styles.input}/>
+
         
           <Button variant="contained" type="submit">
             Enviar

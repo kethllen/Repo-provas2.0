@@ -118,13 +118,19 @@ export async function addViewCount(token: string, id: number) {
 
 }
 
+export async function getInstructorsByDiscipline(token: string, id: number | string){
+  const config = getConfig(token)
+  baseAPI.get(`/instructors/disciplines/${id}`, config)
+}
+
 const api = {
   signUp,
   signIn,
   getTestsByDiscipline,
   getTestsByTeacher,
   getCategories,
-  getDisciplines
+  getDisciplines,
+  getInstructorsByDiscipline
 };
 
 export default api;
